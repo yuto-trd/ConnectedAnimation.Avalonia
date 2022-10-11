@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32922.545
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Avalonia.ConnectedAnimation", "Avalonia.ConnectedAnimation\Avalonia.ConnectedAnimation.csproj", "{9379E213-FD07-4B6B-80D9-BB0062AE57BB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleApp", "SampleApp\SampleApp.csproj", "{8A1535FB-B1E2-4731-8726-DA95E76351B8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9379E213-FD07-4B6B-80D9-BB0062AE57BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9379E213-FD07-4B6B-80D9-BB0062AE57BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9379E213-FD07-4B6B-80D9-BB0062AE57BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9379E213-FD07-4B6B-80D9-BB0062AE57BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8A1535FB-B1E2-4731-8726-DA95E76351B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8A1535FB-B1E2-4731-8726-DA95E76351B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8A1535FB-B1E2-4731-8726-DA95E76351B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8A1535FB-B1E2-4731-8726-DA95E76351B8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A879FD66-48B6-4397-81B0-79BCE0DEFD4F}
+	EndGlobalSection
+EndGlobal
