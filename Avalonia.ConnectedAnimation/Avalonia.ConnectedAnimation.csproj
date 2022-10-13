@@ -4,12 +4,17 @@
         <TargetFramework>net6.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <AvaloniaVersion>11.0.0-preview2</AvaloniaVersion>
-        <!--<AvaloniaVersion>0.10.18</AvaloniaVersion>-->
+        
+        <RepositoryUrl>https://github.com/indigo-san/Avalonia.ConnectedAnimation</RepositoryUrl>
+        <PackageId>Avalonia.ConnectedAnimation</PackageId>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <Version>1.0.0</Version>
+        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+        <Authors>https://github.com/indigo-san</Authors>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Avalonia" Version="$(AvaloniaVersion)" />
+        <PackageReference Include="Avalonia" Version="11.0.0-preview2" />
     </ItemGroup>
 
 </Project>
