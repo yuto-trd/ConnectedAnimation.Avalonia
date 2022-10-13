@@ -5,12 +5,14 @@ namespace Avalonia.ConnectedAnimation;
 
 public class ConnectedAnimationService : AvaloniaObject
 {
+    private static readonly AttachedProperty<ConnectedAnimationService> AnimationServiceProperty =
+        AvaloniaProperty.RegisterAttached<ConnectedAnimationService, AvaloniaObject, ConnectedAnimationService>("AnimationService");
+
+    private readonly Dictionary<string, ConnectedAnimation> _connectingAnimations = new();
+
     private ConnectedAnimationService()
     {
     }
-
-    private readonly Dictionary<string, ConnectedAnimation> _connectingAnimations =
-        new Dictionary<string, ConnectedAnimation>();
 
     public void PrepareToAnimate(string key, Control source)
     {
@@ -56,9 +58,6 @@ public class ConnectedAnimationService : AvaloniaObject
         }
         return null;
     }
-
-    private static readonly AttachedProperty<ConnectedAnimationService> AnimationServiceProperty =
-        AvaloniaProperty.RegisterAttached<ConnectedAnimationService, AvaloniaObject, ConnectedAnimationService>("AnimationService");
 
     public static ConnectedAnimationService GetForCurrentView(Visual visual)
     {
