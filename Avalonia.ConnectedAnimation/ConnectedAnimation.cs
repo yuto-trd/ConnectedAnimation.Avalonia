@@ -69,7 +69,8 @@ public class ConnectedAnimation
         //await destination.WaitVisualTreeAttached();
         if (renderRoot == null)
         {
-            await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.MinValue);
+            // Wait to be attached to VisualTree
+            await Dispatcher.UIThread.InvokeAsync(() => { });
             renderRoot = destination.GetVisualRoot();
         }
 

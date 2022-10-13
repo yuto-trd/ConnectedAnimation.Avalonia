@@ -53,7 +53,8 @@ public partial class FirstPage : UserControl, IPage
             list.SelectedItem = itemViewModel;
         }
 
-        await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.MinValue);
+        // Without this dispatch, old Image, TextBlock will be returned.
+        await Dispatcher.UIThread.InvokeAsync(() => { });
         var index = list.SelectedIndex;
         var container = list.ItemContainerGenerator.ContainerFromIndex(index);
 

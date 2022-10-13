@@ -1,13 +1,9 @@
-using Avalonia;
 using Avalonia.ConnectedAnimation;
 using Avalonia.Controls;
-using Avalonia.Media.Imaging;
 using Avalonia.Threading;
-using Avalonia.VisualTree;
 
 using FluentAvalonia.UI.Navigation;
 
-using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace SampleApp;
@@ -22,7 +18,8 @@ public partial class SecondPage : UserControl, IPage
     public async void OnNavigateTo(NavigationEventArgs args)
     {
         DataContext = args.Parameter;
-        await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.MinValue);
+        // Without this dispatch, the size of the TextBlock will be Stretched.
+        await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Layout);
 
         var anm = ConnectedAnimationService.GetForCurrentView(this);
         ConnectedAnimation? avatarAnm = anm.GetAnimation("avatarImage");
