@@ -21,16 +21,7 @@ public class ConnectedAnimation
         _source = source ?? throw new ArgumentNullException(nameof(source));
         _reportCompleted = completed ?? throw new ArgumentNullException(nameof(completed));
 
-        var sourceBounds = _source.Bounds;
-
-        var root = _source.GetVisualRoot()!;
-        var topLeft = _source.TranslatePoint(default, root);
-        var bottomRight = _source.TranslatePoint(new Point(sourceBounds.Width, sourceBounds.Height), root);
-
-        if (topLeft.HasValue && bottomRight.HasValue)
-        {
-            _sourceBounds = new Rect(topLeft.Value, bottomRight.Value);
-        }
+        _sourceBounds = source.AbsoluteBounds();
     }
 
     public string Key { get; }
@@ -70,41 +61,26 @@ public class ConnectedAnimation
         }
 
         var connectionHost = new ConnectedVisual(_sourceBounds, destination);
+        var direction = Helper.GetDirection(_sourceBounds, connectionHost.DestinationBounds);
+        var coordinatedHosts = coordinatedElements
+            .Select(x => new CoordinatedVisual(connectionHost, x, direction))
+            .ToArray();
+
         var adorner = ConnectedAnimationAdorner.FindFrom(destination, renderRoot);
         adorner.Children.Add(connectionHost);
+        adorner.Children.AddRange(coordinatedHosts);
 
-        var animation = new Animation.Animation()
-        {
-            Duration = TimeSpan.FromMilliseconds(500),
-            Easing = new CircularEaseInOut(),
-            Children =
-            {
-                new KeyFrame()
-                {
-                    Cue = new Cue(0),
-                    Setters =
-                    {
-                        new Setter(ConnectedVisual.ProgressProperty, 0.0)
-                    }
-                },
-                new KeyFrame()
-                {
-                    Cue = new Cue(1),
-                    Setters =
-                    {
-                        new Setter(ConnectedVisual.ProgressProperty, 1.0)
-                    }
-                }
-            }
-        };
+        var duration = TimeSpan.FromMilliseconds(500);
+        var easing = new CircularEaseInOut();
 
-        var storedOpacity = destination.Opacity;
-        destination.Opacity = 0;
-        await animation.RunAsync(connectionHost, null);
+        var tasks = Task.WhenAll(coordinatedHosts.Select(x => x.RunAnimation(duration, easing, TimeSpan.Zero)));
+        await connectionHost.RunAnimation(duration, easing);
+        await tasks;
+
         _reportCompleted?.Invoke(this, EventArgs.Empty);
 
         adorner.Children.Remove(connectionHost);
-        destination.Opacity = storedOpacity;
+        adorner.Children.RemoveAll(coordinatedHosts);
 
         return true;
     }

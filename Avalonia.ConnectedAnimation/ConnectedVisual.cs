@@ -1,7 +1,10 @@
-﻿using Avalonia.Controls;
+﻿using Avalonia.Animation;
+using Avalonia.Animation.Easings;
+using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
+using Avalonia.Styling;
 using Avalonia.VisualTree;
 
 namespace Avalonia.ConnectedAnimation;
@@ -15,8 +18,6 @@ internal sealed class ConnectedVisual : Control
 
     private readonly Control _destination;
     private readonly Brush _destinationBrush;
-    private readonly Rect _sourceBounds;
-    private readonly Rect _destinationBounds;
     private double _progress = 0.0;
     private readonly RenderTargetBitmap _destinationImage;
 
@@ -27,21 +28,13 @@ internal sealed class ConnectedVisual : Control
 
     public ConnectedVisual(Rect sourceBounds, Control destination)
     {
-        _sourceBounds = sourceBounds;
+        SourceBounds = sourceBounds;
         _destination = destination ?? throw new ArgumentNullException(nameof(destination));
 
         // Store PreviousArrange
         var prevArrange = ((ILayoutable)destination).PreviousArrange;
 
-        var destinationBounds = _destination.Bounds;
-        var root = _destination.GetVisualRoot()!;
-        var topLeft = _destination.TranslatePoint(default, root);
-        var bottomRight = _destination.TranslatePoint(new Point(destinationBounds.Width, destinationBounds.Height), root);
-
-        if (topLeft.HasValue && bottomRight.HasValue)
-        {
-            _destinationBounds = new Rect(topLeft.Value, bottomRight.Value);
-        }
+        DestinationBounds = destination.AbsoluteBounds();
 
         // Pre render
         destination.Measure(Size.Infinity);
@@ -70,13 +63,17 @@ internal sealed class ConnectedVisual : Control
         set => SetAndRaise(ProgressProperty, ref _progress, Math.Clamp(value, 0, 1));
     }
 
+    public Rect DestinationBounds { get; }
+
+    public Rect SourceBounds { get; }
+
     public override void Render(DrawingContext context)
     {
         var bounds = new Rect(
-            (_destinationBounds.Left - _sourceBounds.Left) * _progress + _sourceBounds.Left,
-            (_destinationBounds.Top - _sourceBounds.Top) * _progress + _sourceBounds.Top,
-            (_destinationBounds.Width - _sourceBounds.Width) * _progress + _sourceBounds.Width,
-            (_destinationBounds.Height - _sourceBounds.Height) * _progress + _sourceBounds.Height);
+            (DestinationBounds.Left - SourceBounds.Left) * _progress + SourceBounds.Left,
+            (DestinationBounds.Top - SourceBounds.Top) * _progress + SourceBounds.Top,
+            (DestinationBounds.Width - SourceBounds.Width) * _progress + SourceBounds.Width,
+            (DestinationBounds.Height - SourceBounds.Height) * _progress + SourceBounds.Height);
 
         using (context.PushPreTransform(Matrix.CreateTranslation(bounds.X, bounds.Y)))
         {
@@ -85,5 +82,39 @@ internal sealed class ConnectedVisual : Control
             //_destinationBrush.Opacity = progress;
             context.DrawRectangle(_destinationBrush, null, bounds);
         }
+    }
+
+    public async Task RunAnimation(TimeSpan duration, Easing easing)
+    {
+        var animation = new Animation.Animation()
+        {
+            Duration = duration,
+            Easing = easing,
+            Children =
+            {
+                new KeyFrame()
+                {
+                    Cue = new Cue(0),
+                    Setters =
+                    {
+                        new Setter(ProgressProperty, 0.0)
+                    }
+                },
+                new KeyFrame()
+                {
+                    Cue = new Cue(1),
+                    Setters =
+                    {
+                        new Setter(ProgressProperty, 1.0)
+                    }
+                }
+            }
+        };
+
+        var storedOpacity = _destination.Opacity;
+        _destination.Opacity = 0;
+        await animation.RunAsync(this, null);
+
+        _destination.Opacity = storedOpacity;
     }
 }
