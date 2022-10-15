@@ -61,7 +61,7 @@ public partial class FirstPage : UserControl, IPage
         var anm = ConnectedAnimationService.GetForCurrentView(this);
         ConnectedAnimation? avatarAnm = anm.GetAnimation("avatarImage");
         ConnectedAnimation? userNameAnm = anm.GetAnimation("userName");
-        if (avatarAnm != null /*&& userNameAnm != null*/
+        if (avatarAnm != null && userNameAnm != null
             && container is ListBoxItem item
             && item.Presenter is { Child: StackPanel child })
         {
@@ -70,8 +70,7 @@ public partial class FirstPage : UserControl, IPage
             var avatar = child.GetLogicalChildren().OfType<Image>().First(x => x.Name == "avatarImage");
             var name = child.GetLogicalChildren().OfType<TextBlock>().First(x => x.Name == "userName");
 
-            await avatarAnm.TryStart(avatar, new Control[] { name });
-            //await Task.WhenAll(avatarAnm.TryStart(avatar), userNameAnm.TryStart(name));
+            await Task.WhenAll(avatarAnm.TryStart(avatar), userNameAnm.TryStart(name));
         }
         else
         {
@@ -91,9 +90,9 @@ public partial class FirstPage : UserControl, IPage
                 && item.Presenter is { Child: StackPanel child })
             {
                 var avatar = child.GetLogicalChildren().OfType<Image>().First(x => x.Name == "avatarImage");
-                //var name = child.GetLogicalChildren().OfType<TextBlock>().First(x => x.Name == "userName");
+                var name = child.GetLogicalChildren().OfType<TextBlock>().First(x => x.Name == "userName");
                 anm.PrepareToAnimate("avatarImage", avatar);
-                //anm.PrepareToAnimate("userName", name);
+                anm.PrepareToAnimate("userName", name);
             }
         }
     }

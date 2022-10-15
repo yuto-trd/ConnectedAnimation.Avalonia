@@ -32,13 +32,23 @@
                VerticalAlignment="Top"
                asyncImageLoader:ImageLoader.Source="{Binding Avatar}" />
 
-        <TextBlock Name="userName"
-                   Grid.Column="1"
-                   Margin="16,0"
-                   HorizontalAlignment="Left"
-                   VerticalAlignment="Top"
-                   FontSize="24"
-                   FontWeight="SemiBold"
-                   Text="{Binding Name}" />
+        <StackPanel Grid.Column="1"
+                    Margin="16,0"
+                    Spacing="16">
+            <!--  NOTE: Stretching must be turned off when animating text.  -->
+            <!--  NOTE: テキストをアニメーションする場合はストレッチをオフにする必要があります。  -->
+
+            <TextBlock Name="userName"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Top"
+                       FontSize="24"
+                       FontWeight="SemiBold"
+                       Text="{Binding Name}" />
+
+            <TextBlock Name="coordinated"
+                       HorizontalAlignment="Left"
+                       VerticalAlignment="Top"
+                       Text="Coordianted element" />
+        </StackPanel>
     </Grid>
 </UserControl>

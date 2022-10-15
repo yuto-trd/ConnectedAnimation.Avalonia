@@ -75,8 +75,6 @@ internal sealed class ConnectedVisual : Control, IDisposable
 
     public Rect SourceBounds { get; }
 
-    internal AnimationDirection Direction { get; }
-
     public override void Render(DrawingContext context)
     {
         var bounds = new Rect(new Size(
