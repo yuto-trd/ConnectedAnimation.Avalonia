@@ -6,6 +6,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:ui="using:FluentAvalonia.UI.Controls"
         Title="SampleApp"
+        Width="450"
+        Height="450"
         d:DesignHeight="450"
         d:DesignWidth="800"
         mc:Ignorable="d">

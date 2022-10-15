@@ -23,15 +23,13 @@ public partial class SecondPage : UserControl, IPage
 
         var anm = ConnectedAnimationService.GetForCurrentView(this);
         ConnectedAnimation? avatarAnm = anm.GetAnimation("avatarImage");
-        ConnectedAnimation? userNameAnm = anm.GetAnimation("userName");
-        if (avatarAnm != null && userNameAnm != null)
+        if (avatarAnm != null)
         {
-            await Task.WhenAll(avatarAnm.TryStart(avatarImage), userNameAnm.TryStart(userName, new Control[] { coordinated }));
+            await avatarAnm.TryStart(avatarImage, new Control[] { userName, coordinated });
         }
         else
         {
             avatarAnm?.Cancel();
-            userNameAnm?.Cancel();
         }
     }
 
@@ -39,6 +37,5 @@ public partial class SecondPage : UserControl, IPage
     {
         var anm = ConnectedAnimationService.GetForCurrentView(this);
         anm.PrepareToAnimate("avatarImage", avatarImage);
-        anm.PrepareToAnimate("userName", userName);
     }
 }
