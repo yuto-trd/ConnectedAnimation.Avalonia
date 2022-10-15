@@ -65,6 +65,8 @@ public partial class FirstPage : UserControl, IPage
             && container is ListBoxItem item
             && item.Presenter is { Child: StackPanel child })
         {
+            avatarAnm.Configuration = new DirectConnectedAnimationConfiguration();
+
             var avatar = child.GetLogicalChildren().OfType<Image>().First(x => x.Name == "avatarImage");
             var name = child.GetLogicalChildren().OfType<TextBlock>().First(x => x.Name == "userName");
 

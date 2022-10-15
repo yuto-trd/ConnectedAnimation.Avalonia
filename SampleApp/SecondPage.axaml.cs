@@ -19,7 +19,7 @@ public partial class SecondPage : UserControl, IPage
     {
         DataContext = args.Parameter;
         // Without this dispatch, the size of the TextBlock will be Stretched.
-        await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Layout);
+        await Dispatcher.UIThread.InvokeAsync(() => { });
 
         var anm = ConnectedAnimationService.GetForCurrentView(this);
         ConnectedAnimation? avatarAnm = anm.GetAnimation("avatarImage");

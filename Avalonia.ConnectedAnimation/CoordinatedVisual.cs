@@ -5,35 +5,31 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Styling;
-using Avalonia.VisualTree;
 
 namespace Avalonia.ConnectedAnimation;
 
-internal sealed class CoordinatedVisual : Control
+internal sealed class CoordinatedVisual : Control, IDisposable
 {
     public static readonly DirectProperty<CoordinatedVisual, double> ProgressProperty = ConnectedVisual.ProgressProperty.AddOwner<CoordinatedVisual>(
         o => o.Progress,
         (o, v) => o.Progress = v);
-    private readonly ConnectedVisual _connectedVisual;
     private readonly Control _control;
-    private readonly AnimationDirection _direction;
     private readonly Brush _destinationBrush;
+    private readonly ICurve _curve;
     private readonly Rect _sourceBounds;
     private readonly Rect _destinationBounds;
-    private double _progress = 0.0;
     private readonly RenderTargetBitmap _destinationImage;
     private readonly RelativeLocation _location;
+    private double _progress = 0.0;
 
     static CoordinatedVisual()
     {
         AffectsRender<CoordinatedVisual>(ProgressProperty);
     }
 
-    public CoordinatedVisual(ConnectedVisual connectedVisual, Control control, AnimationDirection direction)
+    public CoordinatedVisual(ConnectedVisual connectedVisual, Control control, ICurve defaultCurve, ConnectedAnimationConfiguration configuration)
     {
-        _connectedVisual = connectedVisual;
         _control = control ?? throw new ArgumentNullException(nameof(control));
-        _direction = direction;
 
         // Store PreviousArrange
         var prevArrange = ((ILayoutable)control).PreviousArrange;
@@ -46,72 +42,34 @@ internal sealed class CoordinatedVisual : Control
             var width = _destinationBounds.Width;
             var height = _destinationBounds.Height;
 
-            double x = 0, y = 0;
             var pos = _destinationBounds.Position - connectedVisual.DestinationBounds.Position;
-            x = connectedVisual.SourceBounds.X + pos.X;
-            y = connectedVisual.SourceBounds.Y + pos.Y;
+            double x = connectedVisual.SourceBounds.X + pos.X;
+            double y = connectedVisual.SourceBounds.Y + pos.Y;
             // 170
 
-            //switch (_location)
-            //{
-            //    case RelativeLocation.Above:
-            //        if (direction.HasFlag(AnimationDirection.Lower))
-            //        {
-            //            y = connectedVisual.DestinationBounds.Top;
-            //        }
-
-            //        if (direction.HasFlag(AnimationDirection.Upper))
-            //        {
-            //            y = connectedVisual.SourceBounds.Top;
-            //        }
-
-            //        x = 0;
-            //        break;
-            //    case RelativeLocation.Below:
-            //        if (direction.HasFlag(AnimationDirection.Lower))
-            //        {
-            //            y = connectedVisual.DestinationBounds.Bottom;
-            //        }
-
-            //        if (direction.HasFlag(AnimationDirection.Upper))
-            //        {
-            //            y = connectedVisual.SourceBounds.Bottom;
-            //        }
-
-            //        x = 0;
-            //        break;
-            //    case RelativeLocation.Right:
-            //        if (direction.HasFlag(AnimationDirection.Left))
-            //        {
-            //            x = connectedVisual.SourceBounds.Right;
-            //        }
-
-            //        if (direction.HasFlag(AnimationDirection.Right))
-            //        {
-            //            x = connectedVisual.DestinationBounds.Right;
-            //        }
-
-            //        y = 0;
-            //        break;
-            //    case RelativeLocation.Left:
-            //        if (direction.HasFlag(AnimationDirection.Left))
-            //        {
-            //            x = connectedVisual.SourceBounds.Left;
-            //        }
-
-            //        if (direction.HasFlag(AnimationDirection.Right))
-            //        {
-            //            x = connectedVisual.DestinationBounds.Left;
-            //        }
-
-            //        y = 0;
-            //        break;
-            //    default:
-            //        break;
-            //}
+            switch (_location)
+            {
+                case RelativeLocation.Above:
+                    y = connectedVisual.SourceBounds.Y + (_destinationBounds.Top - connectedVisual.DestinationBounds.Top);
+                    break;
+                case RelativeLocation.Below:
+                    y = connectedVisual.SourceBounds.Y + (_destinationBounds.Bottom - connectedVisual.DestinationBounds.Bottom);
+                    break;
+                case RelativeLocation.Right:
+                    x = connectedVisual.SourceBounds.X + (_destinationBounds.Right - connectedVisual.DestinationBounds.Right);
+                    break;
+                case RelativeLocation.Left:
+                    x = connectedVisual.SourceBounds.X + (_destinationBounds.Left - connectedVisual.DestinationBounds.Left);
+                    break;
+                default:
+                    break;
+            }
 
             _sourceBounds = new Rect(x, y, width, height);
         }
+
+        _destinationBounds = _destinationBounds.Inflate(control.Margin);
+        _sourceBounds = _sourceBounds.Inflate(control.Margin);
 
         // Pre render
         control.Measure(Size.Infinity);
@@ -133,7 +91,7 @@ internal sealed class CoordinatedVisual : Control
             BitmapInterpolationMode = BitmapInterpolationMode.HighQuality
         };
 
-
+        _curve = configuration.GetCurve(_sourceBounds, _destinationBounds, defaultCurve);
     }
 
     public double Progress
@@ -144,13 +102,13 @@ internal sealed class CoordinatedVisual : Control
 
     public override void Render(DrawingContext context)
     {
-        var bounds = new Rect(
-            (_destinationBounds.Left - _sourceBounds.Left) * _progress + _sourceBounds.Left,
-            (_destinationBounds.Top - _sourceBounds.Top) * _progress + _sourceBounds.Top,
+        var bounds = new Rect(new Size(
             (_destinationBounds.Width - _sourceBounds.Width) * _progress + _sourceBounds.Width,
-            (_destinationBounds.Height - _sourceBounds.Height) * _progress + _sourceBounds.Height);
+            (_destinationBounds.Height - _sourceBounds.Height) * _progress + _sourceBounds.Height));
 
-        using (context.PushPreTransform(Matrix.CreateTranslation(bounds.X, bounds.Y)))
+        var point = _curve.CalculatePosition(_sourceBounds, _destinationBounds, _progress);
+
+        using (context.PushPreTransform(Matrix.CreateTranslation(point.X, point.Y)))
         {
             bounds = bounds.WithX(0).WithY(0);
 
@@ -192,5 +150,10 @@ internal sealed class CoordinatedVisual : Control
         await animation.RunAsync(this, null);
 
         _control.Opacity = storedOpacity;
+    }
+
+    public void Dispose()
+    {
+        _destinationImage.Dispose();
     }
 }

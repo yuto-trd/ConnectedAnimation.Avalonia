@@ -5,28 +5,28 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Styling;
-using Avalonia.VisualTree;
 
 namespace Avalonia.ConnectedAnimation;
 
-internal sealed class ConnectedVisual : Control
+internal sealed class ConnectedVisual : Control, IDisposable
 {
     public static readonly DirectProperty<ConnectedVisual, double> ProgressProperty = AvaloniaProperty.RegisterDirect<ConnectedVisual, double>(
         "Progress",
         o => o.Progress,
         (o, v) => o.Progress = v);
-
     private readonly Control _destination;
     private readonly Brush _destinationBrush;
-    private double _progress = 0.0;
+    private readonly Brush _sourceBrush;
+    private readonly ICurve _curve;
     private readonly RenderTargetBitmap _destinationImage;
+    private double _progress = 0.0;
 
     static ConnectedVisual()
     {
         AffectsRender<ConnectedVisual>(ProgressProperty);
     }
 
-    public ConnectedVisual(Rect sourceBounds, Control destination)
+    public ConnectedVisual(RenderTargetBitmap sourceImage, Rect sourceBounds, Control destination, ICurve defaultCurve, ConnectedAnimationConfiguration configuration)
     {
         SourceBounds = sourceBounds;
         _destination = destination ?? throw new ArgumentNullException(nameof(destination));
@@ -34,7 +34,7 @@ internal sealed class ConnectedVisual : Control
         // Store PreviousArrange
         var prevArrange = ((ILayoutable)destination).PreviousArrange;
 
-        DestinationBounds = destination.AbsoluteBounds();
+        DestinationBounds = destination.AbsoluteBounds().Inflate(destination.Margin);
 
         // Pre render
         destination.Measure(Size.Infinity);
@@ -55,6 +55,14 @@ internal sealed class ConnectedVisual : Control
             Stretch = Stretch.Fill,
             BitmapInterpolationMode = BitmapInterpolationMode.HighQuality
         };
+
+        _sourceBrush = new ImageBrush(sourceImage)
+        {
+            Stretch = Stretch.Fill,
+            BitmapInterpolationMode = BitmapInterpolationMode.HighQuality
+        };
+
+        _curve = configuration.GetCurve(SourceBounds, DestinationBounds, defaultCurve);
     }
 
     public double Progress
@@ -67,19 +75,21 @@ internal sealed class ConnectedVisual : Control
 
     public Rect SourceBounds { get; }
 
+    internal AnimationDirection Direction { get; }
+
     public override void Render(DrawingContext context)
     {
-        var bounds = new Rect(
-            (DestinationBounds.Left - SourceBounds.Left) * _progress + SourceBounds.Left,
-            (DestinationBounds.Top - SourceBounds.Top) * _progress + SourceBounds.Top,
+        var bounds = new Rect(new Size(
             (DestinationBounds.Width - SourceBounds.Width) * _progress + SourceBounds.Width,
-            (DestinationBounds.Height - SourceBounds.Height) * _progress + SourceBounds.Height);
+            (DestinationBounds.Height - SourceBounds.Height) * _progress + SourceBounds.Height));
 
-        using (context.PushPreTransform(Matrix.CreateTranslation(bounds.X, bounds.Y)))
+        var point = _curve.CalculatePosition(SourceBounds, DestinationBounds, _progress);
+
+        using (context.PushPreTransform(Matrix.CreateTranslation(point.X, point.Y)))
         {
-            bounds = bounds.WithX(0).WithY(0);
+            _sourceBrush.Opacity = 1 - _progress;
+            context.DrawRectangle(_sourceBrush, null, bounds);
 
-            //_destinationBrush.Opacity = progress;
             context.DrawRectangle(_destinationBrush, null, bounds);
         }
     }
@@ -116,5 +126,10 @@ internal sealed class ConnectedVisual : Control
         await animation.RunAsync(this, null);
 
         _destination.Opacity = storedOpacity;
+    }
+
+    public void Dispose()
+    {
+        _destinationImage.Dispose();
     }
 }

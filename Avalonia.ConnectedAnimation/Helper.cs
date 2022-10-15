@@ -39,10 +39,10 @@ public static class Helper
         {
             return AnimationDirection.None;
         }
-        else if (sourceCenter.X > destinationCenter.X)
+        else if (sourceCenter.X < destinationCenter.X)
         {
             // 右に移動
-            if (sourceCenter.Y > destinationCenter.Y)
+            if (sourceCenter.Y < destinationCenter.Y)
             {
                 // 下に移動
                 return AnimationDirection.RightLower;
@@ -56,7 +56,7 @@ public static class Helper
         else
         {
             // 左に移動
-            if (sourceCenter.Y > destinationCenter.Y)
+            if (sourceCenter.Y < destinationCenter.Y)
             {
                 // 下に移動
                 return AnimationDirection.LeftLower;
@@ -130,5 +130,10 @@ public static class Helper
         {
             return Rect.Empty;
         }
+    }
+
+    internal static System.Numerics.Vector2 ToVector2(this Point point)
+    {
+        return new System.Numerics.Vector2((float)point.X, (float)point.Y);
     }
 }

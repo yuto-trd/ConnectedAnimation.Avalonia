@@ -10,7 +10,7 @@
              d:DesignHeight="450"
              d:DesignWidth="800"
              mc:Ignorable="d">
-    <StackPanel HorizontalAlignment="Center"
+    <!--<StackPanel HorizontalAlignment="Center"
                 VerticalAlignment="Center"
                 Spacing="8">
         <Image Name="avatarImage"
@@ -23,5 +23,22 @@
                    FontSize="24"
                    FontWeight="SemiBold"
                    Text="{Binding Name}" />
-    </StackPanel>
+    </StackPanel>-->
+    <Grid Margin="16" ColumnDefinitions="Auto,*">
+        <Image Name="avatarImage"
+               Width="120"
+               Height="120"
+               HorizontalAlignment="Left"
+               VerticalAlignment="Top"
+               asyncImageLoader:ImageLoader.Source="{Binding Avatar}" />
+
+        <TextBlock Name="userName"
+                   Grid.Column="1"
+                   Margin="16,0"
+                   HorizontalAlignment="Left"
+                   VerticalAlignment="Top"
+                   FontSize="24"
+                   FontWeight="SemiBold"
+                   Text="{Binding Name}" />
+    </Grid>
 </UserControl>
