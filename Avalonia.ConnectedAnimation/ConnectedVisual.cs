@@ -1,47 +1,40 @@
-﻿using Avalonia.Controls;
+﻿using Avalonia.Animation;
+using Avalonia.Animation.Easings;
+using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
-using Avalonia.VisualTree;
+using Avalonia.Styling;
 
 namespace Avalonia.ConnectedAnimation;
 
-internal sealed class ConnectedVisual : Control
+internal sealed class ConnectedVisual : Control, IDisposable
 {
     public static readonly DirectProperty<ConnectedVisual, double> ProgressProperty = AvaloniaProperty.RegisterDirect<ConnectedVisual, double>(
         "Progress",
         o => o.Progress,
         (o, v) => o.Progress = v);
-
     private readonly Control _destination;
     private readonly Brush _destinationBrush;
-    private readonly Rect _sourceBounds;
-    private readonly Rect _destinationBounds;
-    private double _progress = 0.0;
+    private readonly Brush _sourceBrush;
+    private readonly ICurve _curve;
     private readonly RenderTargetBitmap _destinationImage;
+    private double _progress = 0.0;
 
     static ConnectedVisual()
     {
         AffectsRender<ConnectedVisual>(ProgressProperty);
     }
 
-    public ConnectedVisual(Rect sourceBounds, Control destination)
+    public ConnectedVisual(RenderTargetBitmap sourceImage, Rect sourceBounds, Control destination, ICurve defaultCurve, ConnectedAnimationConfiguration configuration)
     {
-        _sourceBounds = sourceBounds;
+        SourceBounds = sourceBounds;
         _destination = destination ?? throw new ArgumentNullException(nameof(destination));
 
         // Store PreviousArrange
         var prevArrange = ((ILayoutable)destination).PreviousArrange;
 
-        var destinationBounds = _destination.Bounds;
-        var root = _destination.GetVisualRoot()!;
-        var topLeft = _destination.TranslatePoint(default, root);
-        var bottomRight = _destination.TranslatePoint(new Point(destinationBounds.Width, destinationBounds.Height), root);
-
-        if (topLeft.HasValue && bottomRight.HasValue)
-        {
-            _destinationBounds = new Rect(topLeft.Value, bottomRight.Value);
-        }
+        DestinationBounds = destination.AbsoluteBounds().Inflate(destination.Margin);
 
         // Pre render
         destination.Measure(Size.Infinity);
@@ -62,6 +55,14 @@ internal sealed class ConnectedVisual : Control
             Stretch = Stretch.Fill,
             BitmapInterpolationMode = BitmapInterpolationMode.HighQuality
         };
+
+        _sourceBrush = new ImageBrush(sourceImage)
+        {
+            Stretch = Stretch.Fill,
+            BitmapInterpolationMode = BitmapInterpolationMode.HighQuality
+        };
+
+        _curve = configuration.GetCurve(SourceBounds, DestinationBounds, defaultCurve);
     }
 
     public double Progress
@@ -70,20 +71,65 @@ internal sealed class ConnectedVisual : Control
         set => SetAndRaise(ProgressProperty, ref _progress, Math.Clamp(value, 0, 1));
     }
 
+    public Rect DestinationBounds { get; }
+
+    public Rect SourceBounds { get; }
+
+    internal AnimationDirection Direction { get; }
+
     public override void Render(DrawingContext context)
     {
-        var bounds = new Rect(
-            (_destinationBounds.Left - _sourceBounds.Left) * _progress + _sourceBounds.Left,
-            (_destinationBounds.Top - _sourceBounds.Top) * _progress + _sourceBounds.Top,
-            (_destinationBounds.Width - _sourceBounds.Width) * _progress + _sourceBounds.Width,
-            (_destinationBounds.Height - _sourceBounds.Height) * _progress + _sourceBounds.Height);
+        var bounds = new Rect(new Size(
+            (DestinationBounds.Width - SourceBounds.Width) * _progress + SourceBounds.Width,
+            (DestinationBounds.Height - SourceBounds.Height) * _progress + SourceBounds.Height));
 
-        using (context.PushPreTransform(Matrix.CreateTranslation(bounds.X, bounds.Y)))
+        var point = _curve.CalculatePosition(SourceBounds, DestinationBounds, _progress);
+
+        using (context.PushPreTransform(Matrix.CreateTranslation(point.X, point.Y)))
         {
-            bounds = bounds.WithX(0).WithY(0);
+            _sourceBrush.Opacity = 1 - _progress;
+            context.DrawRectangle(_sourceBrush, null, bounds);
 
-            //_destinationBrush.Opacity = progress;
             context.DrawRectangle(_destinationBrush, null, bounds);
         }
+    }
+
+    public async Task RunAnimation(TimeSpan duration, Easing easing)
+    {
+        var animation = new Animation.Animation()
+        {
+            Duration = duration,
+            Easing = easing,
+            Children =
+            {
+                new KeyFrame()
+                {
+                    Cue = new Cue(0),
+                    Setters =
+                    {
+                        new Setter(ProgressProperty, 0.0)
+                    }
+                },
+                new KeyFrame()
+                {
+                    Cue = new Cue(1),
+                    Setters =
+                    {
+                        new Setter(ProgressProperty, 1.0)
+                    }
+                }
+            }
+        };
+
+        var storedOpacity = _destination.Opacity;
+        _destination.Opacity = 0;
+        await animation.RunAsync(this, null);
+
+        _destination.Opacity = storedOpacity;
+    }
+
+    public void Dispose()
+    {
+        _destinationImage.Dispose();
     }
 }

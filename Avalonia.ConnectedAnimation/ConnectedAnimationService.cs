@@ -1,4 +1,5 @@
-﻿using Avalonia.Controls;
+﻿using Avalonia.Animation.Easings;
+using Avalonia.Controls;
 using Avalonia.VisualTree;
 
 namespace Avalonia.ConnectedAnimation;
@@ -13,6 +14,21 @@ public class ConnectedAnimationService : AvaloniaObject
     private ConnectedAnimationService()
     {
     }
+
+    // 450
+    // 750
+    public TimeSpan DefaultDuration { get; set; } = TimeSpan.FromMilliseconds(300);
+
+    // https://easings.net/
+    //var easing = new SplineEasing(0, .79, 1, -0.18);
+    //var easing = new SplineEasing(0, 0, 1, 0);
+    //var easing = new SplineEasing(0, 0.83, 1, 0.17);
+    //var easing = new QuinticEaseInOut();
+    //var easing = new ExponentialEaseInOut();
+    //var easing = new CircularEaseInOut();
+    public Easing DefaultEasingFunction { get; set; } = new SplineEasing(0.1, 0.9, 0.2, 1);
+
+    public ICurve DefaultCurve { get; set; } = new LinearCurve();
 
     public void PrepareToAnimate(string key, Control source)
     {
@@ -30,7 +46,7 @@ public class ConnectedAnimationService : AvaloniaObject
             throw new ArgumentException("The specified key is already prepared for animation and should not be prepared repeatedly.", nameof(key));
         }
 
-        info = new ConnectedAnimation(key, source, OnAnimationCompleted);
+        info = new ConnectedAnimation(key, source, OnAnimationCompleted, this);
         _connectingAnimations.Add(key, info);
     }
 

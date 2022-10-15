@@ -1,6 +1,7 @@
 ﻿using Avalonia.Animation;
 using Avalonia.Animation.Easings;
 using Avalonia.Controls;
+using Avalonia.Media.Imaging;
 using Avalonia.Styling;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -13,30 +14,34 @@ public class ConnectedAnimation
 {
     private readonly Control _source;
     private readonly EventHandler _reportCompleted;
+    private readonly ConnectedAnimationService _service;
     private readonly Rect _sourceBounds;
+    private readonly RenderTargetBitmap _sourceImage;
+    private bool _isDisposed;
 
-    internal ConnectedAnimation(string key, Control source, EventHandler completed)
+    internal ConnectedAnimation(string key, Control source, EventHandler completed, ConnectedAnimationService service)
     {
         Key = key ?? throw new ArgumentNullException(nameof(key));
         _source = source ?? throw new ArgumentNullException(nameof(source));
         _reportCompleted = completed ?? throw new ArgumentNullException(nameof(completed));
-
-        var sourceBounds = _source.Bounds;
-
-        var root = _source.GetVisualRoot()!;
-        var topLeft = _source.TranslatePoint(default, root);
-        var bottomRight = _source.TranslatePoint(new Point(sourceBounds.Width, sourceBounds.Height), root);
-
-        if (topLeft.HasValue && bottomRight.HasValue)
-        {
-            _sourceBounds = new Rect(topLeft.Value, bottomRight.Value);
-        }
+        _service = service ?? throw new ArgumentNullException(nameof(service));
+        _sourceBounds = source.AbsoluteBounds().Inflate(source.Margin);
+        // Pre render
+        source.Measure(Size.Infinity);
+        source.Arrange(new Rect(source.DesiredSize));
+        _sourceImage = new RenderTargetBitmap(PixelSize.FromSize(source.DesiredSize, 1));
+        _sourceImage.Render(source);
     }
 
     public string Key { get; }
 
+    public ConnectedAnimationConfiguration Configuration { get; set; } = new GravityConnectedAnimationConfiguration();
+
     public void Cancel()
     {
+        _sourceImage.Dispose();
+        _isDisposed = true;
+
         _reportCompleted?.Invoke(this, EventArgs.Empty);
     }
 
@@ -55,7 +60,7 @@ public class ConnectedAnimation
         {
             throw new ArgumentNullException(nameof(coordinatedElements));
         }
-        if (Equals(_source, destination))
+        if (Equals(_source, destination) || _isDisposed)
         {
             return false;
         }
@@ -69,42 +74,26 @@ public class ConnectedAnimation
             renderRoot = destination.GetVisualRoot();
         }
 
-        var connectionHost = new ConnectedVisual(_sourceBounds, destination);
+        var connectionHost = new ConnectedVisual(_sourceImage, _sourceBounds, destination, _service.DefaultCurve, Configuration);
+        var coordinatedHosts = coordinatedElements
+            .Select(x => new CoordinatedVisual(connectionHost, x, _service.DefaultCurve, Configuration))
+            .ToArray();
+
         var adorner = ConnectedAnimationAdorner.FindFrom(destination, renderRoot);
         adorner.Children.Add(connectionHost);
+        adorner.Children.AddRange(coordinatedHosts);
 
-        var animation = new Animation.Animation()
-        {
-            Duration = TimeSpan.FromMilliseconds(500),
-            Easing = new CircularEaseInOut(),
-            Children =
-            {
-                new KeyFrame()
-                {
-                    Cue = new Cue(0),
-                    Setters =
-                    {
-                        new Setter(ConnectedVisual.ProgressProperty, 0.0)
-                    }
-                },
-                new KeyFrame()
-                {
-                    Cue = new Cue(1),
-                    Setters =
-                    {
-                        new Setter(ConnectedVisual.ProgressProperty, 1.0)
-                    }
-                }
-            }
-        };
+        var duration = Configuration.GetDuration(_sourceBounds, connectionHost.DestinationBounds, _service.DefaultDuration);
+        var easing = Configuration.GetEasing(_sourceBounds, connectionHost.DestinationBounds, _service.DefaultEasingFunction);
 
-        var storedOpacity = destination.Opacity;
-        destination.Opacity = 0;
-        await animation.RunAsync(connectionHost, null);
+        var tasks = Task.WhenAll(coordinatedHosts.Select(x => x.RunAnimation(duration, easing, TimeSpan.Zero)));
+        await connectionHost.RunAnimation(duration, easing);
+        await tasks;
+
         _reportCompleted?.Invoke(this, EventArgs.Empty);
 
         adorner.Children.Remove(connectionHost);
-        destination.Opacity = storedOpacity;
+        adorner.Children.RemoveAll(coordinatedHosts);
 
         return true;
     }
