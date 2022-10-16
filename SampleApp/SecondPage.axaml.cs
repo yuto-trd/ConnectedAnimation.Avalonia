@@ -1,10 +1,9 @@
-using Avalonia.ConnectedAnimation;
 using Avalonia.Controls;
 using Avalonia.Threading;
 
-using FluentAvalonia.UI.Navigation;
+using ConnectedAnimation.Avalonia;
 
-using System.Threading.Tasks;
+using FluentAvalonia.UI.Navigation;
 
 namespace SampleApp;
 
@@ -22,7 +21,7 @@ public partial class SecondPage : UserControl, IPage
         await Dispatcher.UIThread.InvokeAsync(() => { });
 
         var anm = ConnectedAnimationService.GetForCurrentView(this);
-        ConnectedAnimation? avatarAnm = anm.GetAnimation("avatarImage");
+        var avatarAnm = anm.GetAnimation("avatarImage");
         if (avatarAnm != null)
         {
             await avatarAnm.TryStart(avatarImage, new Control[] { userName, coordinated });

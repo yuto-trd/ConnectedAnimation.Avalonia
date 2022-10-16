@@ -1,8 +1,9 @@
-﻿using Avalonia.Animation.Easings;
+﻿using Avalonia;
+using Avalonia.Animation.Easings;
 using Avalonia.Controls;
 using Avalonia.VisualTree;
 
-namespace Avalonia.ConnectedAnimation;
+namespace ConnectedAnimation.Avalonia;
 
 public class ConnectedAnimationService : AvaloniaObject
 {

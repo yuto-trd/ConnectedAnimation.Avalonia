@@ -1,10 +1,11 @@
-﻿using Avalonia.Controls;
+﻿using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Rendering;
 using Avalonia.Styling;
 using Avalonia.VisualTree;
 
-namespace Avalonia.ConnectedAnimation;
+namespace ConnectedAnimation.Avalonia;
 
 internal sealed class ConnectedAnimationAdorner : Canvas
 {

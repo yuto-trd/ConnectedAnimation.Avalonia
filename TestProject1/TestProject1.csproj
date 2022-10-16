@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Avalonia.ConnectedAnimation\Avalonia.ConnectedAnimation.csproj" />
+    <ProjectReference Include="..\ConnectedAnimation.Avalonia\ConnectedAnimation.Avalonia.csproj" />
   </ItemGroup>
 
 </Project>

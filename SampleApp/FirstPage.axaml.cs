@@ -4,13 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using Avalonia;
-using Avalonia.ConnectedAnimation;
 using Avalonia.Controls;
 using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
 using Avalonia.LogicalTree;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+
+using ConnectedAnimation.Avalonia;
 
 using FluentAvalonia.Core;
 using FluentAvalonia.UI.Controls;
@@ -59,7 +60,7 @@ public partial class FirstPage : UserControl, IPage
         var container = list.ItemContainerGenerator.ContainerFromIndex(index);
 
         var anm = ConnectedAnimationService.GetForCurrentView(this);
-        ConnectedAnimation? avatarAnm = anm.GetAnimation("avatarImage");
+        var avatarAnm = anm.GetAnimation("avatarImage");
         if (avatarAnm != null
             && container is ListBoxItem item
             && item.Presenter is { Child: StackPanel child })

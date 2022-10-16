@@ -1,4 +1,5 @@
-﻿using Avalonia.Animation;
+﻿using Avalonia;
+using Avalonia.Animation;
 using Avalonia.Animation.Easings;
 using Avalonia.Controls;
 using Avalonia.Layout;
@@ -6,7 +7,7 @@ using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Styling;
 
-namespace Avalonia.ConnectedAnimation;
+namespace ConnectedAnimation.Avalonia;
 
 internal sealed class CoordinatedVisual : Control, IDisposable
 {
@@ -119,7 +120,7 @@ internal sealed class CoordinatedVisual : Control, IDisposable
 
     public async Task RunAnimation(TimeSpan duration, Easing easing, TimeSpan delay)
     {
-        var animation = new Animation.Animation()
+        var animation = new Animation()
         {
             Duration = duration,
             Delay = delay,

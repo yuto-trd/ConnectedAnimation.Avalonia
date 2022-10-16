@@ -1,4 +1,4 @@
-﻿namespace Avalonia.ConnectedAnimation;
+﻿namespace ConnectedAnimation.Avalonia;
 
 [Flags]
 internal enum AnimationDirection

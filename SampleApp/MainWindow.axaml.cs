@@ -1,7 +1,8 @@
 using Avalonia;
-using Avalonia.ConnectedAnimation;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+
+using ConnectedAnimation.Avalonia;
 
 using FluentAvalonia.UI.Media.Animation;
 using FluentAvalonia.UI.Navigation;

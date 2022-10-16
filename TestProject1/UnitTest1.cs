@@ -1,5 +1,5 @@
 using Avalonia;
-using Avalonia.ConnectedAnimation;
+using ConnectedAnimation.Avalonia;
 
 namespace TestProject1;
 

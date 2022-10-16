@@ -1,9 +1,9 @@
-﻿using Avalonia.Controls;
+﻿using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Layout;
-using Avalonia.Utilities;
 using Avalonia.VisualTree;
 
-namespace Avalonia.ConnectedAnimation;
+namespace ConnectedAnimation.Avalonia;
 
 public static class Helper
 {

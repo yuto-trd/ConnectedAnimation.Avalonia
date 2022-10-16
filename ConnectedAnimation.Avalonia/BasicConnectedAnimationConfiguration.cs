@@ -1,6 +1,7 @@
-﻿using Avalonia.Animation.Easings;
+﻿using Avalonia;
+using Avalonia.Animation.Easings;
 
-namespace Avalonia.ConnectedAnimation;
+namespace ConnectedAnimation.Avalonia;
 
 public sealed class BasicConnectedAnimationConfiguration : ConnectedAnimationConfiguration
 {

@@ -1,9 +1,10 @@
 ﻿// https://github.com/opentk/opentk/blob/131db3c812584aad52325c67675ab32ab8c9ddc2/src/OpenTK.Mathematics/Vector/Vector2.cs
 
-using System.Diagnostics.Contracts;
-using System.Numerics;
+using Avalonia;
 
-namespace Avalonia.ConnectedAnimation;
+using System.Diagnostics.Contracts;
+
+namespace ConnectedAnimation.Avalonia;
 
 internal sealed class BezierCurveQuadric : ICurve
 {

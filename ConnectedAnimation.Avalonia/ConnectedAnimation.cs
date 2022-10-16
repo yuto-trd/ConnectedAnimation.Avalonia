@@ -1,4 +1,5 @@
-﻿using Avalonia.Animation;
+﻿using Avalonia;
+using Avalonia.Animation;
 using Avalonia.Animation.Easings;
 using Avalonia.Controls;
 using Avalonia.Media.Imaging;
@@ -8,7 +9,7 @@ using Avalonia.VisualTree;
 
 using System.Diagnostics.CodeAnalysis;
 
-namespace Avalonia.ConnectedAnimation;
+namespace ConnectedAnimation.Avalonia;
 
 public class ConnectedAnimation
 {
