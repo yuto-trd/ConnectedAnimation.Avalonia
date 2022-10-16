@@ -19,10 +19,6 @@ namespace SampleApp
         public static AppBuilder BuildAvaloniaApp()
             => AppBuilder.Configure<App>()
                 .UsePlatformDetect()
-                .With(new Win32PlatformOptions()
-                {
-                    UseCompositor = true,
-                })
                 .LogToTrace();
     }
 }

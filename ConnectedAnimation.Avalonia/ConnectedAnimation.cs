@@ -1,13 +1,8 @@
 ﻿using Avalonia;
-using Avalonia.Animation;
-using Avalonia.Animation.Easings;
 using Avalonia.Controls;
 using Avalonia.Media.Imaging;
-using Avalonia.Styling;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
-
-using System.Diagnostics.CodeAnalysis;
 
 namespace ConnectedAnimation.Avalonia;
 
@@ -71,7 +66,7 @@ public class ConnectedAnimation
         if (renderRoot == null)
         {
             // Wait to be attached to VisualTree
-            await Dispatcher.UIThread.InvokeAsync(() => { });
+            await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.MinValue);
             renderRoot = destination.GetVisualRoot();
         }
 

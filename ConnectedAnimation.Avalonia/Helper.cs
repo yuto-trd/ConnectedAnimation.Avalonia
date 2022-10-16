@@ -1,6 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Layout;
+using Avalonia.Utilities;
 using Avalonia.VisualTree;
 
 using System.Reactive;
@@ -37,7 +38,8 @@ public static class Helper
         var sourceCenter = source.Center;
         var destinationCenter = destination.Center;
 
-        if (sourceCenter.NearlyEquals(destinationCenter))
+        if (MathUtilities.AreClose(sourceCenter.X, destinationCenter.X) &&
+            MathUtilities.AreClose(sourceCenter.Y, destinationCenter.Y))
         {
             return AnimationDirection.None;
         }

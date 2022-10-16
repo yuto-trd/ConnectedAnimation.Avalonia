@@ -7,6 +7,7 @@ using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Styling;
 using Avalonia.Utilities;
+using Avalonia.Visuals.Media.Imaging;
 
 namespace ConnectedAnimation.Avalonia;
 

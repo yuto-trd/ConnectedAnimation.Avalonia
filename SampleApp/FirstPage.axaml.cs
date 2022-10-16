@@ -1,21 +1,16 @@
-using System;
-using System.ComponentModel;
-using System.Linq;
-using System.Threading.Tasks;
-
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
 using Avalonia.LogicalTree;
 using Avalonia.Threading;
-using Avalonia.VisualTree;
 
 using ConnectedAnimation.Avalonia;
 
-using FluentAvalonia.Core;
 using FluentAvalonia.UI.Controls;
 using FluentAvalonia.UI.Navigation;
+
+using System;
+using System.Linq;
 
 namespace SampleApp;
 
@@ -55,7 +50,7 @@ public partial class FirstPage : UserControl, IPage
         }
 
         // Without this dispatch, old Image, TextBlock will be returned.
-        await Dispatcher.UIThread.InvokeAsync(() => { });
+        await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.MinValue);
         var index = list.SelectedIndex;
         var container = list.ItemContainerGenerator.ContainerFromIndex(index);
 
