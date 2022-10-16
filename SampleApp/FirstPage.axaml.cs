@@ -24,10 +24,10 @@ public partial class FirstPage : UserControl, IPage
     public record ItemViewModel(string Avatar, string Name);
     private static readonly ItemViewModel[] s_items =
     {
-        new ItemViewModel("https://avatars.githubusercontent.com/u/66758394?v=4", "indigo-san"),
-        new ItemViewModel("https://avatars.githubusercontent.com/u/79445014?v=4", "b-editor"),
-        new ItemViewModel("https://avatars.githubusercontent.com/u/9141961?v=4", "dotnet"),
         new ItemViewModel("https://avatars.githubusercontent.com/u/14075148?v=4", "AvaloniaUI"),
+        new ItemViewModel("https://avatars.githubusercontent.com/u/9141961?v=4", "dotnet"),
+        new ItemViewModel("https://avatars.githubusercontent.com/u/66758394?v=4", "indigo-san"),
+        new ItemViewModel("https://avatars.githubusercontent.com/u/6154722?v=4", "microsoft"),
     };
 
     public FirstPage()
