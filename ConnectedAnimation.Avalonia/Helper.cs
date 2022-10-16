@@ -3,6 +3,8 @@ using Avalonia.Controls;
 using Avalonia.Layout;
 using Avalonia.VisualTree;
 
+using System.Reactive;
+
 namespace ConnectedAnimation.Avalonia;
 
 public static class Helper
@@ -14,14 +16,14 @@ public static class Helper
             return Task.CompletedTask;
         }
 
-        var tcs = new TaskCompletionSource();
+        var tcs = new TaskCompletionSource<Unit>();
 
         void OnAttachedToVisualTree(object? sender, VisualTreeAttachmentEventArgs e)
         {
             if (control.GetVisualRoot() != null)
             {
                 control.AttachedToVisualTree -= OnAttachedToVisualTree;
-                tcs.SetResult();
+                tcs.SetResult(Unit.Default);
             }
         }
 

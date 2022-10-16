@@ -1,5 +1,6 @@
 ﻿using Avalonia;
 using Avalonia.Animation.Easings;
+using Avalonia.Utilities;
 
 namespace ConnectedAnimation.Avalonia;
 
@@ -14,7 +15,7 @@ public sealed class GravityConnectedAnimationConfiguration : ConnectedAnimationC
     {
         var length = ((Vector)(start.TopLeft - end.TopLeft)).Length + Math.Min(start.Height, end.Height) / 2;
 
-        return TimeSpan.FromMilliseconds(Math.Clamp(length, 170, 400));
+        return TimeSpan.FromMilliseconds(MathUtilities.Clamp(length, 170, 400));
     }
 
     public override Easing GetEasing(Rect start, Rect end, Easing defaultEasing)

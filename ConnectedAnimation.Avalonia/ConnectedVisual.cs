@@ -6,6 +6,7 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Styling;
+using Avalonia.Utilities;
 
 namespace ConnectedAnimation.Avalonia;
 
@@ -69,7 +70,7 @@ internal sealed class ConnectedVisual : Control, IDisposable
     public double Progress
     {
         get => _progress;
-        set => SetAndRaise(ProgressProperty, ref _progress, Math.Clamp(value, 0, 1));
+        set => SetAndRaise(ProgressProperty, ref _progress, MathUtilities.Clamp(value, 0, 1));
     }
 
     public Rect DestinationBounds { get; }
