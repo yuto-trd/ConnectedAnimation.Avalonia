@@ -1,4 +1,7 @@
 # ConnectedAnimation.Avalonia
+
+[![Nuget](https://img.shields.io/nuget/vpre/ConnectedAnimation.Avalonia?label=ConnectedAnimation.Avalonia%20%28nuget%29)](https://www.nuget.org/packages/ConnectedAnimation.Avalonia/)
+
 Reproduction of UWP's ConnectedAnimation for Avalonia.
 
 ![gif](https://raw.githubusercontent.com/indigo-san/ConnectedAnimation.Avalonia/main/sampleapp.gif)
