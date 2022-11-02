@@ -11,8 +11,8 @@
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <Description>Reproduction of UWP's ConnectedAnimation for Avalonia.</Description>
         <PackageTags>ui;csharp;transition-animation;avalonia;avaloniaui;fluent;fluent-design</PackageTags>
-        <Version>1.0.0-preview1</Version>
-        <AssemblyVersion>1.0.0.0</AssemblyVersion>
+        <Version>1.1.0-preview2</Version>
+        <AssemblyVersion>1.1.0.0</AssemblyVersion>
         <Authors>https://github.com/indigo-san</Authors>
     </PropertyGroup>
 
