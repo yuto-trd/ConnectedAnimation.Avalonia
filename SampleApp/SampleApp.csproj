@@ -12,7 +12,7 @@
         <PackageReference Include="Avalonia" Version="11.0.0-preview3" />
         <PackageReference Include="Avalonia.Desktop" Version="11.0.0-preview3" />
         <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.0.0-preview4" />
-        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.0-preview3" />
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.0-preview4" />
         <PackageReference Include="FluentAvaloniaUI" Version="2.0.0-preview3" />
         <PackageReference Include="FluentIcons.Avalonia" Version="1.1.184-preview" />
         <PackageReference Include="XamlNameReferenceGenerator" Version="1.4.2" />
