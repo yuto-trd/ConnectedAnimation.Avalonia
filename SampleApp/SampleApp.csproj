@@ -15,7 +15,7 @@
         <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.0-preview4" />
         <PackageReference Include="FluentAvaloniaUI" Version="2.0.0-preview4" />
         <PackageReference Include="FluentIcons.Avalonia" Version="1.1.184-preview" />
-        <PackageReference Include="XamlNameReferenceGenerator" Version="1.4.2" />
+        <PackageReference Include="XamlNameReferenceGenerator" Version="1.5.1" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\ConnectedAnimation.Avalonia\ConnectedAnimation.Avalonia.csproj" />
